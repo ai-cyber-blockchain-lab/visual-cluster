@@ -48,11 +48,11 @@ int request(void *cls, struct MHD_Connection *connection,
             size_t *upload_data_size, void **con_cls)
 {
     struct MHD_Response *response;
-    const char page[64];
+    char page[64];
     int ret;
 
     if (strncmp(method, "GET", 4) == 0) {
-        snprintf(page, 64, "{rows:%d, cols:%d}", PARTICLES_PER_ROW,  PARTICLES_PER_COL);
+        snprintf(page, sizeof page, "{rows:%d, cols:%d}", PARTICLES_PER_ROW,  PARTICLES_PER_COL);
         response = MHD_create_response_from_buffer(strlen(page), (void *) page, MHD_RESPMEM_PERSISTENT);
         ret = MHD_queue_response(connection, MHD_HTTP_OK, response);
         MHD_destroy_response(response);
