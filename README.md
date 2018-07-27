@@ -11,13 +11,15 @@ This code needs raylib and libmicrohttpd as dependency. libmicrohttpd is fortuna
 Perform the following steps for installation:
 
 ```
-sudo apt-get install git cmake make libraspberrypi-dev raspberrypi-kernel-headers g++ libmicrohttpd-dev
+sudo apt-get update
+sudo apt-get install -y git cmake make libraspberrypi-dev raspberrypi-kernel-headers g++ libmicrohttpd-dev
 
 #takes a while, because raylib repo is big
 git clone https://github.com/raysan5/raylib.git
 cd raylib/src
-make PLATFORM=PLATFORM_RPI
+git checkout 2.0.0
+PLATFORM=PLATFORM_RPI make PLATFORM=PLATFORM_RPI
 sudo make PLATFORM=PLATFORM_RPI install
 ```
 
-Update Memory-split using `raspi-config`. Set Advanced Options -> Memory Split to 256. Turn on proprietary GL driver.
+Update Memory-split using `raspi-config`. Set Advanced Options -> Memory Split to 256. Select legacy GL driver.
