@@ -12,6 +12,8 @@ Perform the following steps for installation:
 
 ```
 sudo apt-get update
+sudo apt-get upgrade
+sudo apt-get remove bluez pi-bluetooth
 sudo apt-get install -y git cmake make libraspberrypi-dev raspberrypi-kernel-headers g++ libmicrohttpd-dev
 
 #takes a while, because raylib repo is big

@@ -15,6 +15,9 @@
 #define NUM_PARTICLES PARTICLES_PER_ROW * PARTICLES_PER_COL
 #define VX_DIVIDER 50
 
+unsigned int particles_per_row = PARTICLES_PER_ROW;
+unsigned int particles_per_col = PARTICLES_PER_COL;
+
 typedef struct particle {
     int x, y;
     double vx, vy;
@@ -40,39 +43,27 @@ void initParticles(int w, int h) {
     }
 }
 
-int request(void *cls, struct MHD_Connection *connection,
+int request(void *cls,
+            struct MHD_Connection *connection,
             const char *url,
             const char *method,
             const char *version,
             const char *upload_data,
-            size_t *upload_data_size, void **con_cls)
-{
-    struct MHD_Response *response;
-    char page[64];
-    int ret;
+            size_t *upload_data_size,
+            void **con_cls);
 
-    if (strncmp(method, "GET", 4) == 0) {
-        snprintf(page, sizeof page, "{rows:%d, cols:%d}", PARTICLES_PER_ROW,  PARTICLES_PER_COL);
-        response = MHD_create_response_from_buffer(strlen(page), (void *) page, MHD_RESPMEM_PERSISTENT);
-        ret = MHD_queue_response(connection, MHD_HTTP_OK, response);
-        MHD_destroy_response(response);
-    } else {
-        response = MHD_create_response_from_buffer(0, (void *) page, MHD_RESPMEM_PERSISTENT);
-        ret = MHD_queue_response(connection, 404, response);
-        MHD_destroy_response(response);
-    }
+static void completed(void *cls, struct MHD_Connection *connection,
+                      void **con_cls, enum MHD_RequestTerminationCode toe);
 
-    return ret;
-}
 
-int main()
-{
+int main() {
     struct MHD_Daemon *daemon;
     int width = 1280;
     int height = 1024;
 
     daemon = MHD_start_daemon(MHD_USE_SELECT_INTERNALLY, PORT, NULL, NULL,
-                              &request, NULL, MHD_OPTION_END);
+                              &request, NULL, MHD_OPTION_NOTIFY_COMPLETED,
+                              completed, NULL, MHD_OPTION_END);
 
     if (NULL == daemon) {
         fprintf(stderr, "startup of webserver failed on port %d\n", PORT);
