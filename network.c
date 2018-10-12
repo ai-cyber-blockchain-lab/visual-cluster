@@ -4,19 +4,13 @@
 #include <string.h>
 #include <stdlib.h>
 
+#include "network.h"
+
 #define GET             0
 #define POST            1
 
 unsigned int particles_per_row;
 unsigned int particles_per_col;
-
-struct connection_info_struct
-{
-  int connectiontype;
-  char *answerstring;
-  struct MHD_PostProcessor *postprocessor;
-};
-
 
 int response(struct MHD_Connection *connection, int code, char *page) {
     int ret;
@@ -28,7 +22,7 @@ int response(struct MHD_Connection *connection, int code, char *page) {
 }
 
 static int
-null_iterator (void *coninfo_cls, enum MHD_ValueKind kind, const char *key,
+null_iterator(void *coninfo_cls, enum MHD_ValueKind kind, const char *key,
               const char *filename, const char *content_type,
               const char *transfer_encoding, const char *data, uint64_t off,
               size_t size)
@@ -82,6 +76,7 @@ int request(void *cls,
         if (*upload_data_size != 0) {
             fprintf(stderr, "got data with size %zu '%s'\n", *upload_data_size, upload_data);
             // MHD_post_process(con_info->postprocessor, upload_data, *upload_data_size);
+            fflush(stderr);
             *upload_data_size = 0;
 
             return MHD_YES;
@@ -93,8 +88,8 @@ int request(void *cls,
     return response(connection, 404, "");
 }
 
-static void completed (void *cls, struct MHD_Connection *connection,
-                       void **con_cls, enum MHD_RequestTerminationCode toe)
+void completed(void *cls, struct MHD_Connection *connection,
+               void **con_cls, enum MHD_RequestTerminationCode toe)
 {
     struct connection_info_struct *con_info = *con_cls;
 
