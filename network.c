@@ -9,7 +9,10 @@
 
 #define GET             0
 #define POST            1
+#define MAX_POST_SIZE   2048
 
+
+int parse_json(const char *json, size_t length);
 
 int response(struct MHD_Connection *connection, int code, char *page) {
     int ret;
@@ -72,19 +75,19 @@ int request(void *cls,
     if (0 == strcmp (method, "POST")) {
         struct connection_info_struct *con_info = *con_cls;
 
-        if (*upload_data_size != 0) {
-            fprintf(stderr, "got data with size %zu '%s'\n", *upload_data_size, upload_data);
-            // MHD_post_process(con_info->postprocessor, upload_data, *upload_data_size);
-            fflush(stderr);
+        if (upload_data && upload_data_size != NULL && *upload_data_size != 0 && *upload_data_size < MAX_POST_SIZE) {
+            int successful = parse_json(upload_data, *upload_data_size);
             *upload_data_size = 0;
 
-            return MHD_YES;
-          }
+            if (!successful) return response(connection, 400, "UNPARSEABLE");
+
+            return response(connection, MHD_HTTP_OK, "PARSED");
+         }
         else if (NULL != con_info->answerstring) {
-            return response(connection, MHD_HTTP_OK, "");
+            return response(connection, MHD_HTTP_OK, "OK");
         }
     }
-    return response(connection, 404, "");
+    return response(connection, 404, "UNKNOWN");
 }
 
 void completed(void *cls, struct MHD_Connection *connection,
