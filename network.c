@@ -5,12 +5,11 @@
 #include <stdlib.h>
 
 #include "network.h"
+#include "particles.h"
 
 #define GET             0
 #define POST            1
 
-unsigned int particles_per_row;
-unsigned int particles_per_col;
 
 int response(struct MHD_Connection *connection, int code, char *page) {
     int ret;

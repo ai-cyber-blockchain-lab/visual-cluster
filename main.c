@@ -8,44 +8,9 @@
 #include <string.h>
 
 #include "network.h"
+#include "particles.h"
 
-#define MIN(a, b) (((a) < (b)) ? (a) : (b))
 #define PORT 8000
-
-#define PARTICLES_PER_ROW 8
-#define PARTICLES_PER_COL 6
-#define NUM_PARTICLES PARTICLES_PER_ROW * PARTICLES_PER_COL
-#define VX_DIVIDER 50
-
-
-unsigned int particles_per_row = PARTICLES_PER_ROW;
-unsigned int particles_per_col = PARTICLES_PER_COL;
-
-typedef struct particle {
-    int x, y;
-    double vx, vy;
-    struct Color color;
-    int radius;
-} particle_t;
-
-particle_t particles[NUM_PARTICLES];
-
-void initParticles(int w, int h) {
-    int i;
-    int xpart = w / PARTICLES_PER_ROW;
-    int ypart = h / PARTICLES_PER_COL;
-    for (i = 0; i < NUM_PARTICLES; i++) {
-        particle_t *p = &particles[i];
-        uint g = rand() % 256;
-        uint r = g / 2 + rand() % 128;
-
-        p->x = xpart * (i % PARTICLES_PER_ROW) + xpart / 2;
-        p->y = ypart * (i / PARTICLES_PER_ROW) + xpart / 2;
-        p->color =  CLITERAL{ r, g, 0, 192 };
-        p->radius = MIN(xpart / 2, ypart / 2);
-    }
-}
-
 
 int main() {
     struct MHD_Daemon *daemon;
@@ -67,9 +32,8 @@ int main() {
     SetTargetFPS(60);
 
     while (!WindowShouldClose()) {
-        particle_t *p;
+        particle *p;
         int i;
-        // TODO: Update your variables here
 
         BeginDrawing();
             ClearBackground(RAYWHITE);
